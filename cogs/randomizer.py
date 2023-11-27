@@ -63,44 +63,38 @@ class randomizer(commands.Cog):
         return calc_embed
 
     @discord.slash_command(name='roll', description='ROLL A DIE.')
-    async def roll(self, ctx, amount: Option(int, 'how many dice?', required=True), sides: Option(int, 'how many sides to each die?', required=True), modifier: Option(int, 'modify the result?', required=False)):
-        if amount == 0:
-            error_embed = self.error_embed_creator('**` YOU ROLLED ZERO DICE. `**' + '\n\n' + '❌ ` /roll 0d20 `' + '\n' + '✅ ` /roll 1d20 `' + '\n' + '✅ ` /roll 2d20 `' + '\n' + '✅ ` /roll 3d20 `')
-            await ctx.send_response('_ _', embed=error_embed, ephemeral=True)
-        elif sides == 0:
-            error_embed = self.error_embed_creator('**` A DIE CANNOT HAVE ZERO SIDES. `**' + '\n\n' + '❌ ` /roll 1d0  `' + '\n' + '✅ ` /roll 1d1  `' + '\n' + '✅ ` /roll 1d2  `' + '\n' + '✅ ` /roll 1d20 `')
-            await ctx.send_response('_ _', embed=error_embed, ephemeral=True)
+    async def roll(self, ctx, amount: Option(int, 'how many dice?', min_value=1, required=True), sides: Option(int, 'how many sides to each die?', min_value=1, required=True), modifier: Option(int, 'modify the result?', required=False)):
         
-        elif abs(amount) == 1:
-            number = random.randint(1, abs(sides))
+        if amount == 1:
+            number = random.randint(1, sides)
             if not modifier:
-                result = number
-                command_txt = f'**` D{abs(sides)} `**'
+                command_txt = f'**` D{sides} `**'
 
-                no_mod_embed = self.no_calc_embed_creator(result, command_txt)
+                no_mod_embed = self.no_calc_embed_creator(number, command_txt)
                 no_mod_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
                 await ctx.send('_ _', embed=no_mod_embed)
             else:
                 result = number + modifier
-                command_txt = f'**` D{abs(sides)} `** **` + `** **` ({modifier}) `**'
+                command_txt = f'**` D{sides} `** **` + `** **` ({modifier}) `**'
                 calc_txt = f'` ({number}) ` ` + ` ` ({modifier}) ` ` = ` **` ({result}) `**'
 
                 mod_embed = self.calc_embed_creator(result, command_txt, calc_txt)
                 mod_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
                 await ctx.send('_ _', embed=mod_embed)
         else:
-            rolled_dice = [random.randint(1, abs(sides)) for die in range(abs(amount))]
+            rolled_dice = [random.randint(1, sides) for die in range(amount)]
             rolled_dice_txt = ' + '.join([f'{num}' for num in rolled_dice])
             result = sum(rolled_dice)
             if not modifier:
-                command_txt = f'**` {abs(amount)} `** **` D{abs(sides)} `**'
+                command_txt = f'**` {amount} D{sides} `**'
                 calc_txt = f'` ({rolled_dice_txt}) ` ` = ` **` ({result}) `**'
 
                 no_mod_embed = self.calc_embed_creator(result, command_txt, calc_txt)
                 no_mod_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
                 await ctx.send('_ _', embed=no_mod_embed)
             else:
-                command_txt = f'**` {abs(amount)} `** **` D{abs(sides)} `** **` + `** **` ({modifier}) `**'
+                result += modifier
+                command_txt = f'**` {amount} D{sides} `** **` + `** **` ({modifier}) `**'
                 calc_txt = f'` ({rolled_dice_txt}) ` ` + ` ` ({modifier}) ` ` = ` **` ({result}) `**'
 
                 mod_embed = self.calc_embed_creator(result, command_txt, calc_txt)
