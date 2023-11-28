@@ -22,8 +22,8 @@ class randomizer(commands.Cog):
     
     def choice_embed_creator(self, result_txt, choices_txt):
         choice_embed = discord.Embed(
-                title = '🎯 \a YOU CHOSE \a ' + f'**` {result_txt} `**',
-                description = f'🏹 \a **FROM THE CHOICES** \a {choices_txt}',
+                title = '🎯 \a YOU CHOSE \a' + f'**` {result_txt} `**',
+                description = f'🏹 \a **FROM THE CHOICES** \a{choices_txt}',
                 color = 13580881,
             )
         choice_embed.set_thumbnail(url="https://i.pinimg.com/474x/66/a2/f1/66a2f1f57f17bd300d250a0cfc8e0baf.jpg")
@@ -38,49 +38,59 @@ class randomizer(commands.Cog):
             choices = choices.split(';')
             choices_array = [f'**` {choice.strip().upper()} `**' for choice in choices]
             result_txt = random.choice(choices).strip().upper()
-            choices_txt = ' \a '.join(choices_array)
+            choices_txt = ' \a'.join(choices_array)
 
             choice_embed = self.choice_embed_creator(result_txt, choices_txt)
             choice_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
             await ctx.send('_ _', embed=choice_embed)
 
-    def no_calc_embed_creator(self, result, command_txt):
-        no_calc_embed = discord.Embed(
-            title = '🎲 \a YOU ROLLED \a ' + f'**` {result} `**',
-            description = f'🎰 \a **FROM THE ROLL** \a {command_txt}',
+    def simple_embed_creator(self, result, command_txt):
+        simple_embed = discord.Embed(
+            title = f'🎲 \a YOU ROLLED \a**` {result} `**',
+            description = f'🎰 \a **FROM THE ROLL** \a{command_txt}',
             color = 15252813,
         )
-        no_calc_embed.set_thumbnail(url="https://i.pinimg.com/474x/66/a2/f1/66a2f1f57f17bd300d250a0cfc8e0baf.jpg")
-        return no_calc_embed
+        simple_embed.set_thumbnail(url="https://i.pinimg.com/474x/66/a2/f1/66a2f1f57f17bd300d250a0cfc8e0baf.jpg")
+        return simple_embed
     
-    def calc_embed_creator(self, result, command_txt, calc_txt):
-        calc_embed = discord.Embed(
-            title = '🎲 \a YOU ROLLED \a ' + f'**` {result} `**',
-            description = f'🎰 \a **FROM THE ROLL** \a {command_txt}' + '\n' + f'🧮 \a **CALCULATED AS** \a {calc_txt}',
+    def simple_comment_embed_creator(self, comment_txt, result, command_txt):
+        simple_comment_embed = discord.Embed(
+            title = f'🎲 \a YOU ROLLED \a**` {result} `**' + '\n' + f'💬 \a **` {comment_txt} `**',
+            description = f'🎰 \a **FROM THE ROLL** \a{command_txt}',
             color = 15252813,
         )
-        calc_embed.set_thumbnail(url="https://i.pinimg.com/474x/66/a2/f1/66a2f1f57f17bd300d250a0cfc8e0baf.jpg")
-        return calc_embed
-
-    @discord.slash_command(name='roll', description='ROLL A DIE.')
-    async def roll(self, ctx, amount: Option(int, 'how many dice?', min_value=1, required=True), sides: Option(int, 'how many sides to each die?', min_value=1, required=True), modifier: Option(int, 'modify the result?', required=False)):
-        
+        simple_comment_embed.set_thumbnail(url="https://i.pinimg.com/474x/66/a2/f1/66a2f1f57f17bd300d250a0cfc8e0baf.jpg")
+        return simple_comment_embed
+    
+    def calc_no_comment_embed_creator(self, result, command_txt, calc_txt):
+        calc_no_comment_embed = discord.Embed(
+            title = f'🎲 \a YOU ROLLED \a**` {result} `**',
+            description = f'🎰 \a **FROM THE ROLL** \a{command_txt}' + '\n' + f'🧮 \a **CALCULATED AS** \a{calc_txt}',
+            color = 15252813,
+        )
+        calc_no_comment_embed.set_thumbnail(url="https://i.pinimg.com/474x/66/a2/f1/66a2f1f57f17bd300d250a0cfc8e0baf.jpg")
+        return calc_no_comment_embed
+    
+    def calc_comment_embed_creator(self, comment_txt, result, command_txt, calc_txt):
+        calc_comment_embed = discord.Embed(
+            title = f'🎲 \a YOU ROLLED \a**` {result} `**' + '\n' + f'💬 \a **` {comment_txt} `**',
+            description = f'🎰 \a **FROM THE ROLL** \a{command_txt}' + '\n' + f'🧮 \a **CALCULATED AS** \a{calc_txt}',
+            color = 15252813,
+        )
+        calc_comment_embed.set_thumbnail(url="https://i.pinimg.com/474x/66/a2/f1/66a2f1f57f17bd300d250a0cfc8e0baf.jpg")
+        return calc_comment_embed
+    
+    def roll_helper(self, amount, sides, modifier):
         if amount == 1:
             number = random.randint(1, sides)
             if not modifier:
                 command_txt = f'**` D{sides} `**'
-
-                no_mod_embed = self.no_calc_embed_creator(number, command_txt)
-                no_mod_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
-                await ctx.send('_ _', embed=no_mod_embed)
+                return number, command_txt
             else:
                 result = number + modifier
                 command_txt = f'**` D{sides} `** **` + `** **` ({modifier}) `**'
                 calc_txt = f'` ({number}) ` ` + ` ` ({modifier}) ` ` = ` **` ({result}) `**'
-
-                mod_embed = self.calc_embed_creator(result, command_txt, calc_txt)
-                mod_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
-                await ctx.send('_ _', embed=mod_embed)
+                return result, command_txt, calc_txt
         else:
             rolled_dice = [random.randint(1, sides) for die in range(amount)]
             rolled_dice_txt = ' + '.join([f'{num}' for num in rolled_dice])
@@ -88,18 +98,33 @@ class randomizer(commands.Cog):
             if not modifier:
                 command_txt = f'**` {amount} D{sides} `**'
                 calc_txt = f'` ({rolled_dice_txt}) ` ` = ` **` ({result}) `**'
-
-                no_mod_embed = self.calc_embed_creator(result, command_txt, calc_txt)
-                no_mod_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
-                await ctx.send('_ _', embed=no_mod_embed)
+                return result, command_txt, calc_txt
             else:
                 result += modifier
                 command_txt = f'**` {amount} D{sides} `** **` + `** **` ({modifier}) `**'
                 calc_txt = f'` ({rolled_dice_txt}) ` ` + ` ` ({modifier}) ` ` = ` **` ({result}) `**'
+                return result, command_txt, calc_txt
 
-                mod_embed = self.calc_embed_creator(result, command_txt, calc_txt)
-                mod_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
-                await ctx.send('_ _', embed=mod_embed)
+    @discord.slash_command(name='roll', description='ROLL A DIE.')
+    async def roll(self, ctx, amount: Option(int, 'how many dice?', min_value=1, required=True), sides: Option(int, 'how many sides to each die?', min_value=1, required=True), modifier: Option(int, 'modify the result?', required=False), comment: Option(str, 'what are you rolling for?', required=False)):
+        output_array = self.roll_helper(amount, sides, modifier)
+        if amount == 1 and not modifier:
+            if not comment:
+                simple_embed = self.simple_embed_creator(output_array[0], output_array[1])
+                simple_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
+                await ctx.send('_ _', embed=simple_embed)
+            else:
+                simple_comment_embed = self.simple_comment_embed_creator(str(comment.upper()), output_array[0], output_array[1])
+                simple_comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
+                await ctx.send('_ _', embed=simple_comment_embed)
+        elif not comment:
+            no_comment_embed = self.calc_no_comment_embed_creator(output_array[0], output_array[1], output_array[2])
+            no_comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
+            await ctx.send('_ _', embed=no_comment_embed)
+        else:
+            comment_embed = self.calc_comment_embed_creator(str(comment.upper()), output_array[0], output_array[1], output_array[2])
+            comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
+            await ctx.send('_ _', embed=comment_embed)
 
 def setup(bot):
     bot.add_cog(randomizer(bot))
