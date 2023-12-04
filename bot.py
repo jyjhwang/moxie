@@ -4,19 +4,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-GUILD = os.getenv('DISCORD_GUILD')
 
 intents = discord.Intents().all()
 client = discord.Client(intents=intents)
 
 activity = discord.Activity(type=discord.ActivityType.watching, name='over you.')
-bot = discord.Bot(activity=activity)
+bot = discord.Bot(activity=activity, status=discord.Status.idle)
 
 cogs_list = [
     'moderation',
     'randomizer',
     'roster',
-    'stat_roller',
 ]
 
 for cog in cogs_list:
