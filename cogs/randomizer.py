@@ -26,7 +26,6 @@ class randomizer(commands.Cog):
                 description = f'🏹 \a **FROM THE CHOICES** \a{choices_txt}',
                 color = 13580881,
             )
-        choice_embed.set_thumbnail(url="https://i.pinimg.com/474x/66/a2/f1/66a2f1f57f17bd300d250a0cfc8e0baf.jpg")
         return choice_embed
 
     @discord.slash_command(name='choose', description='CHOOSE WISELY.')
@@ -42,6 +41,8 @@ class randomizer(commands.Cog):
 
             choice_embed = self.choice_embed_creator(result_txt, choices_txt)
             choice_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
+            choice_embed.set_thumbnail(url=ctx.author.display_avatar.url)
+            await ctx.send_response('_ _', ephemeral=True, delete_after=1)
             await ctx.send('_ _', embed=choice_embed)
 
     def simple_embed_creator(self, result, command_txt):
@@ -50,7 +51,6 @@ class randomizer(commands.Cog):
             description = f'🎰 \a **FROM THE ROLL** \a{command_txt}',
             color = 15252813,
         )
-        simple_embed.set_thumbnail(url="https://i.pinimg.com/474x/66/a2/f1/66a2f1f57f17bd300d250a0cfc8e0baf.jpg")
         return simple_embed
     
     def simple_comment_embed_creator(self, comment_txt, result, command_txt):
@@ -59,7 +59,6 @@ class randomizer(commands.Cog):
             description = f'🎰 \a **FROM THE ROLL** \a{command_txt}',
             color = 15252813,
         )
-        simple_comment_embed.set_thumbnail(url="https://i.pinimg.com/474x/66/a2/f1/66a2f1f57f17bd300d250a0cfc8e0baf.jpg")
         return simple_comment_embed
     
     def calc_no_comment_embed_creator(self, result, command_txt, calc_txt):
@@ -68,7 +67,6 @@ class randomizer(commands.Cog):
             description = f'🎰 \a **FROM THE ROLL** \a{command_txt}' + '\n' + f'🧮 \a **CALCULATED AS** \a{calc_txt}',
             color = 15252813,
         )
-        calc_no_comment_embed.set_thumbnail(url="https://i.pinimg.com/474x/66/a2/f1/66a2f1f57f17bd300d250a0cfc8e0baf.jpg")
         return calc_no_comment_embed
     
     def calc_comment_embed_creator(self, comment_txt, result, command_txt, calc_txt):
@@ -77,7 +75,6 @@ class randomizer(commands.Cog):
             description = f'🎰 \a **FROM THE ROLL** \a{command_txt}' + '\n' + f'🧮 \a **CALCULATED AS** \a{calc_txt}',
             color = 15252813,
         )
-        calc_comment_embed.set_thumbnail(url="https://i.pinimg.com/474x/66/a2/f1/66a2f1f57f17bd300d250a0cfc8e0baf.jpg")
         return calc_comment_embed
     
     def roll_helper(self, amount, sides, modifier):
@@ -112,18 +109,26 @@ class randomizer(commands.Cog):
             if not comment:
                 simple_embed = self.simple_embed_creator(output_array[0], output_array[1])
                 simple_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
+                simple_embed.set_thumbnail(url=ctx.author.display_avatar.url)
+                await ctx.send_response('_ _', ephemeral=True, delete_after=1)
                 await ctx.send('_ _', embed=simple_embed)
             else:
                 simple_comment_embed = self.simple_comment_embed_creator(str(comment.upper()), output_array[0], output_array[1])
                 simple_comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
+                simple_comment_embed.set_thumbnail(url=ctx.author.display_avatar.url)
+                await ctx.send_response('_ _', ephemeral=True, delete_after=1)
                 await ctx.send('_ _', embed=simple_comment_embed)
         elif not comment:
             no_comment_embed = self.calc_no_comment_embed_creator(output_array[0], output_array[1], output_array[2])
             no_comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
+            no_comment_embed.set_thumbnail(url=ctx.author.display_avatar.url)
+            await ctx.send_response('_ _', ephemeral=True, delete_after=1)
             await ctx.send('_ _', embed=no_comment_embed)
         else:
             comment_embed = self.calc_comment_embed_creator(str(comment.upper()), output_array[0], output_array[1], output_array[2])
             comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
+            comment_embed.set_thumbnail(url=ctx.author.display_avatar.url)
+            await ctx.send_response('_ _', ephemeral=True, delete_after=1)
             await ctx.send('_ _', embed=comment_embed)
 
 def setup(bot):

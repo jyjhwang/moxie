@@ -1,7 +1,6 @@
 import os
 import discord
 from dotenv import load_dotenv
-from discord.ext import commands
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -10,9 +9,11 @@ GUILD = os.getenv('DISCORD_GUILD')
 intents = discord.Intents().all()
 client = discord.Client(intents=intents)
 
-bot = discord.Bot()
+activity = discord.Activity(type=discord.ActivityType.watching, name='over you.')
+bot = discord.Bot(activity=activity)
 
 cogs_list = [
+    'moderation',
     'randomizer',
     'roster',
     'stat_roller',

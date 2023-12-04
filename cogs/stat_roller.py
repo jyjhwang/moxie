@@ -49,7 +49,7 @@ class stat_roller(commands.Cog):
                 chara_info = await cursor.fetchone()
                 return chara_info
             
-    def roll_stat_helper(self, stat_modifier, amount, sides, modifier):
+    def stat_roll_helper(self, stat_modifier, amount, sides, modifier):
         if amount == 1:
             number = random.randint(1, sides)
             if not modifier:
@@ -77,25 +77,28 @@ class stat_roller(commands.Cog):
                 calc_txt = f'` ({rolled_dice_txt}) + ({stat_modifier}) ` ` + ` ` ({modifier}) ` ` = ` **` ({result}) `**'
                 return result, command_txt, calc_txt
 
-    @discord.slash_command(name='roll_stat', description='ROLL WITH YOUR STATS.')
-    async def roll_stat(self, ctx, character: Option(str, 'for which character?', required=True), stat: Option(str, 'for which stat?', choices=stat_array, required=True), amount: Option(int, 'how many dice?', min_value=1, required=True), sides: Option(int, 'how many sides to each die?', min_value=1, required=True), modifier: Option(int, 'modify the result?', required=False), comment: Option(str, 'what are you rolling for?', required=False)):
+    @discord.slash_command(name='stat_roll', description='ROLL WITH YOUR STATS.')
+    async def stat_roll(self, ctx, character: Option(str, 'for which character?', required=True), stat: Option(str, 'for which stat?', choices=stat_array, required=True), amount: Option(int, 'how many dice?', min_value=1, required=True), sides: Option(int, 'how many sides to each die?', min_value=1, required=True), modifier: Option(int, 'modify the result?', required=False), comment: Option(str, 'what are you rolling for?', required=False)):
         selected_character = await self.select_character(ctx.author.id, ctx.guild.id, character.upper())
         if not selected_character:
             error_embed = self.error_embed_creator('**` THIS CHARACTER COULD NOT BE FOUND. `**' + '\n\n' + f'❓ **` {character.upper()} `** ` DOES NOT EXIST. `')
-            await ctx.send_response('_ _', embed=error_embed, ephemeral=True)
+            await ctx.send_response('_ _', embed=error_embed, ephemeral=True, delete_after=10)
         else:
             stat_column = stat_dict[stat]
             stat_modifier = selected_character[stat_column]
-            chara_color = selected_character[5]
+            hex_str = selected_character[5]
+            hex_int = int(hex_str, base=16)
             chara_img = selected_character[6]
-            output_array = self.roll_stat_helper(stat_modifier, amount, sides, modifier)
+            output_array = self.stat_roll_helper(stat_modifier, amount, sides, modifier)
             if not comment:
-                no_comment_embed = self.no_comment_embed_creator(character.upper(), int(chara_color), chara_img, output_array[0], output_array[1], output_array[2])
+                no_comment_embed = self.no_comment_embed_creator(character.upper(), hex_int, chara_img, output_array[0], output_array[1], output_array[2])
                 no_comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
+                await ctx.send_response('_ _', ephemeral=True, delete_after=1)
                 await ctx.send('_ _', embed=no_comment_embed)
             else:
-                comment_embed = self.comment_embed_creator(character.upper(), int(chara_color), chara_img, str(comment.upper()), output_array[0], output_array[1], output_array[2])
+                comment_embed = self.comment_embed_creator(character.upper(), hex_int, chara_img, comment.upper(), output_array[0], output_array[1], output_array[2])
                 comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
+                await ctx.send_response('_ _', ephemeral=True, delete_after=1)
                 await ctx.send('_ _', embed=comment_embed)
 
 def setup(bot):
