@@ -30,13 +30,16 @@ class Moderation(commands.Cog):
     @discord.slash_command(name='prune', description='PRUNE MESSAGES.')
     @commands.has_permissions(manage_messages=True)
     async def prune(self, ctx, amount: Option(int, 'how many messages?', min_value=1, required=True), user: Option(discord.User, 'from a specific user?', required=False)):
-        def specific_user(message):
-            return message.author == user
+        limit = amount
+        messages = await ctx.channel.history(limit=amount).flatten()
+        for msg in messages:
+            if msg.pinned:
+                limit += 1
         if not user:
-            await ctx.channel.purge(limit=amount)
+            await ctx.channel.purge(limit=limit, check=lambda msg: not msg.pinned)
             await ctx.send_response(f'❌ ` PRUNED `  **{amount} MESSAGES.**', ephemeral=True)
         else:
-            await ctx.channel.purge(limit=amount, check=specific_user)
+            await ctx.channel.purge(limit=limit, check=lambda msg: msg.author == user and not msg.pinned)
             await ctx.send_response(f'❌ ` PRUNED `  **{amount} MESSAGES** FROM {user.mention}', ephemeral=True)
 
     async def select_rolegroup(self, guildid, rolegroupname):
@@ -53,7 +56,7 @@ class Moderation(commands.Cog):
         selected_rolegroup = await self.select_rolegroup(ctx.guild.id, rolegroup)
         role_ids = selected_rolegroup[3].replace(' ', '').split(',')
 
-        button_styles = [discord.ButtonStyle.blurple, discord.ButtonStyle.green, discord.ButtonStyle.red]
+        button_styles = [discord.ButtonStyle.blurple, discord.ButtonStyle.green, discord.ButtonStyle.red, discord.ButtonStyle.green]
         for i, role_id in enumerate(role_ids):
             remainder = i % len(button_styles)
             role = ctx.guild.get_role(int(role_id))
