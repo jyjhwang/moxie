@@ -49,37 +49,19 @@ class Randomizer(commands.Cog):
         else:
             return f'{value}'
     
-    def simple_embed_creator(self, result, command_txt):
-        simple_embed = discord.Embed(
-            title = f'🎲 \a YOU ROLLED \a**` {result} `**',
-            description = f'🎰 \a **FROM THE ROLL** \a{command_txt}',
-            color = int('2B2D31', base=16),
+    def roll_embed(self, result, command_txt, comment_txt=None, calc_txt=None):
+        title_txt = f'🎲 \a YOU ROLLED \a**` {result} `**'
+        if comment_txt:
+            title_txt += '\n' + f'💬 \a **` {comment_txt} `**'
+        description_txt = f'🎰 \a **FROM THE ROLL** \a{command_txt}'
+        if calc_txt:
+            description_txt += '\n' + f'🧮 \a **CALCULATED AS** \a{calc_txt}'
+        roll_embed = discord.Embed(
+            title=title_txt,
+            description=description_txt,
+            color=int('2B2D31', base=16),
         )
-        return simple_embed
-    
-    def simple_comment_embed_creator(self, comment_txt, result, command_txt):
-        simple_comment_embed = discord.Embed(
-            title = f'🎲 \a YOU ROLLED \a**` {result} `**' + '\n' + f'💬 \a **` {comment_txt} `**',
-            description = f'🎰 \a **FROM THE ROLL** \a{command_txt}',
-            color = int('2B2D31', base=16),
-        )
-        return simple_comment_embed
-    
-    def calc_embed_creator(self, result, command_txt, calc_txt):
-        calc_embed = discord.Embed(
-            title = f'🎲 \a YOU ROLLED \a**` {result} `**',
-            description = f'🎰 \a **FROM THE ROLL** \a{command_txt}' + '\n' + f'🧮 \a **CALCULATED AS** \a{calc_txt}',
-            color = int('2B2D31', base=16),
-        )
-        return calc_embed
-    
-    def calc_comment_embed_creator(self, comment_txt, result, command_txt, calc_txt):
-        calc_comment_embed = discord.Embed(
-            title = f'🎲 \a YOU ROLLED \a**` {result} `**' + '\n' + f'💬 \a **` {comment_txt} `**',
-            description = f'🎰 \a **FROM THE ROLL** \a{command_txt}' + '\n' + f'🧮 \a **CALCULATED AS** \a{calc_txt}',
-            color = int('2B2D31', base=16),
-        )
-        return calc_comment_embed
+        return roll_embed
     
     def roll_helper(self, amount, sides, apply, modifier):
         if amount == 1:
@@ -87,11 +69,11 @@ class Randomizer(commands.Cog):
             if modifier:
                 modifier_str = self.pos_or_neg(modifier)
                 result = number + modifier
-                command_txt = f'**` D{sides} `** **` ( {modifier_str} ) `**'
-                calc_txt = f'` ({number}) `' + '\n' + f'🧮 \a **MODIFIED WITH** \a` ( {modifier_str} ) `'
-                return result, command_txt, calc_txt
+                command_txt = f'` D{sides} ` ` {modifier_str} `'
+                calc_txt = f'` ({number}) `' + '\n' + f'🧩 \a **MODIFIED WITH** \a` {modifier_str} `'
+                return result, command_txt, None, calc_txt
             else:
-                command_txt = f'**` D{sides} `**'
+                command_txt = f'` D{sides} `'
                 return number, command_txt
         else:
             rolled_dice = [random.randint(1, sides) for die in range(amount)]
@@ -105,72 +87,49 @@ class Randomizer(commands.Cog):
                 if modifier:
                     modifier_str = self.pos_or_neg(modifier)
                     result = apply_roll + modifier
-                    command_txt = f'**` {amount} D{sides} `** **` {apply} `** **` ( {modifier_str} ) `**'
-                    calc_txt = f'` {rolled_dice_txt} ` ` {apply} `' + '\n' + f'🧮 \a **MODIFIED WITH** \a` ( {modifier_str} ) `'
-                    return result, command_txt, calc_txt
+                    command_txt = f'` {amount} D{sides} ` ` {apply} ` ` {modifier_str} `'
+                    calc_txt = f'` {rolled_dice_txt} ` ` {apply} `' + '\n' + f'🧩 \a **MODIFIED WITH** \a` {modifier_str} `'
+                    return result, command_txt, None, calc_txt
                 else:
                     command_txt = f'**` {amount} D{sides} `** **` {apply} `**'
                     calc_txt = f'` {rolled_dice_txt} ` ` {apply} `'
-                    return apply_roll, command_txt, calc_txt
+                    return apply_roll, command_txt, None, calc_txt
             else:
                 rolled_dice_txt = ' + '.join([f'{num}' for num in rolled_dice])
                 if modifier:
                     modifier_str = self.pos_or_neg(modifier)
                     result += modifier
-                    command_txt = f'**` {amount} D{sides} `** **` ( {modifier_str} ) `**'
-                    calc_txt = f'` ({rolled_dice_txt}) `' + '\n' + f'🧮 \a **MODIFIED WITH** \a` ( {modifier_str} ) `'
-                    return result, command_txt, calc_txt
+                    command_txt = f'` {amount} D{sides} ` ` {modifier_str} `'
+                    calc_txt = f'` ({rolled_dice_txt}) `' + '\n' + f'🧩 \a **MODIFIED WITH** \a` {modifier_str} `'
+                    return result, command_txt, None, calc_txt
                 else:
-                    command_txt = f'**` {amount} D{sides} `**'
-                    calc_txt = f'` ({rolled_dice_txt}) ` ` = ` **` ({result}) `**'
-                    return result, command_txt, calc_txt
+                    command_txt = f'` {amount} D{sides} `'
+                    calc_txt = f'` ({rolled_dice_txt}) `'
+                    return result, command_txt, None, calc_txt
 
     @roll.command(name='dice', description='ROLLS DICE.')
     async def dice(self, ctx, amount: Option(int, 'how many dice?', min_value=1, required=True), sides: Option(int, 'how many sides to each die?', min_value=1, required=True), apply: Option(str, 'advantage or disdvantage?', choices=['ADVANTAGE', 'DISADVANTAGE'], required=False), modifier: Option(int, 'modify the result?', required=False), comment: Option(str, 'what are you rolling for?', required=False)):
         output_array = self.roll_helper(amount, sides, apply, modifier)
         if amount == 1 and not modifier:
-            if not comment:
-                simple_embed = self.simple_embed_creator(output_array[0], output_array[1])
-                simple_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
-                simple_embed.set_thumbnail(url=ctx.author.display_avatar.url)
-                await ctx.send_response('_ _', ephemeral=True, delete_after=1)
-                await ctx.send('_ _', embed=simple_embed)
-            else:
-                simple_comment_embed = self.simple_comment_embed_creator(str(comment.upper()), output_array[0], output_array[1])
-                simple_comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
-                simple_comment_embed.set_thumbnail(url=ctx.author.display_avatar.url)
-                await ctx.send_response('_ _', ephemeral=True, delete_after=1)
-                await ctx.send('_ _', embed=simple_comment_embed)
-        elif not comment:
-            no_comment_embed = self.calc_embed_creator(output_array[0], output_array[1], output_array[2])
-            no_comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
-            no_comment_embed.set_thumbnail(url=ctx.author.display_avatar.url)
-            await ctx.send_response('_ _', ephemeral=True, delete_after=1)
-            await ctx.send('_ _', embed=no_comment_embed)
+            embed = self.roll_embed(output_array[0], output_array[1], comment)
         else:
-            comment_embed = self.calc_comment_embed_creator(str(comment.upper()), output_array[0], output_array[1], output_array[2])
-            comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
-            comment_embed.set_thumbnail(url=ctx.author.display_avatar.url)
-            await ctx.send_response('_ _', ephemeral=True, delete_after=1)
-            await ctx.send('_ _', embed=comment_embed)
+            embed = self.roll_embed(output_array[0], output_array[1], comment, output_array[3])
+        embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
+        embed.set_thumbnail(url=ctx.author.display_avatar.url)
+        await ctx.send_response('_ _', ephemeral=True, delete_after=1)
+        await ctx.send('_ _', embed=embed)
     
-    def no_comment_embed_creator(self, charaname, characolor, charaimg, charastat, result, command_txt, calc_txt):
-        no_comment_embed = discord.Embed(
-            title = f'🎲 \a {charaname} ROLLED \a**` {result} `** \aFOR {charastat}',
+    def stat_embed_creator(self, charaname, characolor, charaimg, charastat, result, command_txt, calc_txt, comment_txt=None):
+        title_txt = f'🎲 \a {charaname} ROLLED \a**` {result} `** \aFOR {charastat}'
+        if comment_txt:
+            title_txt += '\n' + f'💬 \a **` {comment_txt} `**'
+        stat_embed = discord.Embed(
+            title = title_txt,
             description = f'🎰 \a **FROM THE ROLL** \a{command_txt}' + '\n' + f'🧮 \a **CALCULATED AS** \a{calc_txt}',
             color = characolor,
         )
-        no_comment_embed.set_thumbnail(url=charaimg)
-        return no_comment_embed
-    
-    def comment_embed_creator(self, charaname, characolor, charaimg, charastat, comment_txt, result, command_txt, calc_txt):
-        comment_embed = discord.Embed(
-            title = f'🎲 \a {charaname} ROLLED \a**` {result} `** \aFOR {charastat}' + '\n' + f'💬 \a **` {comment_txt} `**',
-            description = f'🎰 \a **FROM THE ROLL** \a{command_txt}' + '\n' + f'🧮 \a **CALCULATED AS** \a{calc_txt}',
-            color = characolor,
-        )
-        comment_embed.set_thumbnail(url=charaimg)
-        return comment_embed
+        stat_embed.set_thumbnail(url=charaimg)
+        return stat_embed
     
     async def select_character(self, userid, guildid, charaname):
         async with aiosqlite.connect('roster.db') as db:
@@ -186,13 +145,13 @@ class Randomizer(commands.Cog):
             if modifier:
                 modifier_str = self.pos_or_neg(modifier)
                 result = number + stat_modifier + modifier
-                command_txt = f'**` D{sides} `** **` ({stat_modifier_str} {stat}) `** **` ( {modifier_str} ) `**'
-                calc_txt = f'` ({number}) `' + '\n' + f'🧮 \a **MODIFIED WITH** \a` ({stat_modifier_str} {stat}) ` ` ( {modifier_str} ) `'
+                command_txt = f'` D{sides} ` ` ({stat_modifier_str} {stat}) ` ` ( {modifier_str} ) `'
+                calc_txt = f'` ({number}) `' + '\n' + f'🧩 \a **MODIFIED WITH** \a` ({stat_modifier_str} {stat}) ` ` ( {modifier_str} ) `'
                 return result, command_txt, calc_txt
             else:
                 result = number + stat_modifier
-                command_txt = f'**` D{sides} `** **` ({stat_modifier_str} {stat}) `**'
-                calc_txt = f'` ({number}) `' + '\n' + f'🧮 \a **MODIFIED WITH** \a` ({stat_modifier_str} {stat}) `'
+                command_txt = f'` D{sides} ` ` ({stat_modifier_str} {stat}) `'
+                calc_txt = f'` ({number}) `' + '\n' + f'🧩 \a **MODIFIED WITH** \a` ({stat_modifier_str} {stat}) `'
                 return result, command_txt, calc_txt
         else:
             rolled_dice = [random.randint(1, sides) for die in range(amount)]
@@ -206,26 +165,26 @@ class Randomizer(commands.Cog):
                 if modifier:
                     modifier_str = self.pos_or_neg(modifier)
                     result = apply_roll + stat_modifier + modifier
-                    command_txt = f'**` {amount} D{sides} `** **` {apply} `** **` ({stat_modifier_str} {stat}) `** **` ( {modifier_str} ) `**'
-                    calc_txt = f'` {rolled_dice_txt} ` ` {apply} `' + '\n' + f'🧮 \a **MODIFIED WITH** \a` ({stat_modifier_str} {stat}) ` ` ( {modifier_str} ) `'
+                    command_txt = f'` {amount} D{sides} ` ` {apply} ` ` ({stat_modifier_str} {stat}) ` ` ( {modifier_str} ) `'
+                    calc_txt = f'` {rolled_dice_txt} ` ` {apply} `' + '\n' + f'🧩 \a **MODIFIED WITH** \a` ({stat_modifier_str} {stat}) ` ` ( {modifier_str} ) `'
                     return result, command_txt, calc_txt
                 else:
                     result = apply_roll + stat_modifier
-                    command_txt = f'**` {amount} D{sides} `** **` {apply} `** **` ({stat_modifier_str} {stat}) `**'
-                    calc_txt = f'` {rolled_dice_txt} ` ` {apply} `' + '\n' + f'🧮 \a **MODIFIED WITH** \a` ({stat_modifier_str} {stat}) `'
+                    command_txt = f'` {amount} D{sides} ` ` {apply} ` ` ({stat_modifier_str} {stat}) `'
+                    calc_txt = f'` {rolled_dice_txt} ` ` {apply} `' + '\n' + f'🧩 \a **MODIFIED WITH** \a` ({stat_modifier_str} {stat}) `'
                     return result, command_txt, calc_txt
             else:
                 rolled_dice_txt = ' + '.join([f'{num}' for num in rolled_dice])
                 if modifier:
                     modifier_str = self.pos_or_neg(modifier)
                     result = sum_dice + stat_modifier + modifier
-                    command_txt = f'**` {amount} D{sides} `** **` ({stat_modifier_str} {stat}) `** **` ( {modifier_str} ) `**'
-                    calc_txt = f'` ({rolled_dice_txt}) `' + '\n' + f'🧮 \a **MODIFIED WITH** \a` ({stat_modifier_str} {stat}) ` ` ( {modifier_str} ) `'
+                    command_txt = f'` {amount} D{sides} ` ` ({stat_modifier_str} {stat}) ` ` ( {modifier_str} ) `'
+                    calc_txt = f'` ({rolled_dice_txt}) `' + '\n' + f'🧩 \a **MODIFIED WITH** \a` ({stat_modifier_str} {stat}) ` ` ( {modifier_str} ) `'
                     return result, command_txt, calc_txt
                 else:
                     result = sum_dice + stat_modifier
-                    command_txt = f'**` {amount} D{sides} `** **` ({stat_modifier_str} {stat}) `**'
-                    calc_txt = f'` ({rolled_dice_txt}) `' + '\n' + f'🧮 \a **MODIFIED WITH** \a` ({stat_modifier_str} {stat}) `'
+                    command_txt = f'` {amount} D{sides} ` ` ({stat_modifier_str} {stat}) `'
+                    calc_txt = f'` ({rolled_dice_txt}) `' + '\n' + f'🧩 \a **MODIFIED WITH** \a` ({stat_modifier_str} {stat}) `'
                     return result, command_txt, calc_txt
 
     @roll.command(name='stat', description='ROLLS DICE WITH YOUR STATS.')
@@ -241,16 +200,9 @@ class Randomizer(commands.Cog):
             hex_int = int(hex_str, base=16)
             chara_img = selected_character[6]
             output_array = self.stat_roll_helper(stat, stat_modifier, amount, sides, apply, modifier)
-            if not comment:
-                no_comment_embed = self.no_comment_embed_creator(character.upper(), hex_int, chara_img, stat, output_array[0], output_array[1], output_array[2])
-                no_comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
-                await ctx.send_response('_ _', ephemeral=True, delete_after=1)
-                await ctx.send('_ _', embed=no_comment_embed)
-            else:
-                comment_embed = self.comment_embed_creator(character.upper(), hex_int, chara_img, stat, comment.upper(), output_array[0], output_array[1], output_array[2])
-                comment_embed.add_field(name='', value=f'🆔 \a {ctx.author.mention}')
-                await ctx.send_response('_ _', ephemeral=True, delete_after=1)
-                await ctx.send('_ _', embed=comment_embed)
+            stat_embed = self.stat_embed_creator(character.upper(), hex_int, chara_img, stat, output_array[0], output_array[1], output_array[2], comment)
+            await ctx.send_response('_ _', ephemeral=True, delete_after=1)
+            await ctx.send('_ _', embed=stat_embed)
 
 def setup(bot):
     bot.add_cog(Randomizer(bot))
