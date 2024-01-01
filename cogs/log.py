@@ -2,7 +2,7 @@ import discord
 import numpy as np
 from discord.ext import commands
 from discord.commands import Option, SlashCommandGroup
-from utils import error_embed_creator
+from utils import error_embed_creator, get_postID
 
 class Log(commands.Cog):
     def __init__(self, bot):
@@ -12,14 +12,11 @@ class Log(commands.Cog):
     async def on_ready(self):
         print('Log COG loaded.')
 
-    def get_postID(self, link):
-        return link.split('/')[-1]
-
     @discord.slash_command(name='log', description='LOGS MESSAGES.', guild_only=True)
     @commands.has_permissions(read_message_history=True)
     async def log(self, ctx, thread: Option(discord.Thread, 'UNARCHIVED DISCORD THREAD', required=True), start: Option(str, 'COPY MESSAGE LINK OR MESSAGE ID', default=None), end: Option(str, 'COPY MESSAGE LINK OR MESSAGE ID', default=None), limit: Option(int, 'only how many messages?', min_value=1, default=None)):
-        start_postID = self.get_postID(start) if start else None
-        end_postID = self.get_postID(end) if end else None
+        start_postID = get_postID(start) if start else None
+        end_postID = get_postID(end) if end else None
         try:
             if start_postID:
                 start = await discord.get_message(start_postID)
