@@ -18,11 +18,12 @@ class Randomizer(commands.Cog):
     async def on_ready(self):
         print('Randomizer COG loaded.')
     
-    def choice_embed_creator(self, result_txt, choices_txt):
+    def choice_embed_creator(self, result_txt, choices_txt, embed_link):
         choice_embed = discord.Embed(
                 title = '🎯\a YOU CHOSE \a' + f'**` {result_txt} `**',
                 description = f'🏹\a **FROM THE CHOICES** \a{choices_txt}',
                 color = int('2B2D31', base=16),
+                url = embed_link,
             )
         return choice_embed
 
@@ -36,8 +37,9 @@ class Randomizer(commands.Cog):
             choices_format = [f'**` {choice.strip().upper()} `**' for choice in choices_array]
             result_txt = random.choice(choices_array).strip().upper()
             choices_txt = ' \a'.join(choices_format)
+            embed_link = f'https://discord.com/channels/{ctx.guild.id}/{ctx.channel.id}'
 
-            choice_embed = self.choice_embed_creator(result_txt, choices_txt)
+            choice_embed = self.choice_embed_creator(result_txt, choices_txt, embed_link)
             choice_embed.set_thumbnail(url=ctx.author.display_avatar.url)
             await ctx.respond('_ _', embed=choice_embed)
 
@@ -47,7 +49,7 @@ class Randomizer(commands.Cog):
         else:
             return f'{value}'
     
-    def dice_embed_creator(self, result, command_txt, comment_txt=None, calc_txt=None):
+    def dice_embed_creator(self, result, command_txt, embed_link, comment_txt=None, calc_txt=None):
         title_txt = f'🎲\a YOU ROLLED \a**` {result} `**'
         if comment_txt:
             title_txt += '\n' + f'💬\a **` {comment_txt} `**'
@@ -58,6 +60,7 @@ class Randomizer(commands.Cog):
             title = title_txt,
             description = description_txt,
             color = int('2B2D31', base=16),
+            url = embed_link,
         )
         return dice_embed
     
@@ -108,14 +111,15 @@ class Randomizer(commands.Cog):
     @roll.command(name='dice', description='ROLLS DICE.')
     async def dice(self, ctx, amount: Option(int, 'how many dice?', min_value=1, required=True), sides: Option(int, 'how many sides to each die?', min_value=1, required=True), apply: Option(str, 'advantage or disdvantage?', choices=['ADVANTAGE', 'DISADVANTAGE'], required=False), modifier: Option(int, 'modify the result?', required=False), comment: Option(str, 'what are you rolling for?', required=False)):
         output_array = self.roll_dice_helper(amount, sides, apply, modifier)
+        embed_link = f'https://discord.com/channels/{ctx.guild.id}/{ctx.channel.id}'
         if amount == 1 and not modifier:
-            dice_embed = self.dice_embed_creator(output_array[0], output_array[1], comment)
+            dice_embed = self.dice_embed_creator(output_array[0], output_array[1], embed_link, comment)
         else:
-            dice_embed = self.dice_embed_creator(output_array[0], output_array[1], comment, output_array[3])
+            dice_embed = self.dice_embed_creator(output_array[0], output_array[1], embed_link, comment, output_array[3])
         dice_embed.set_thumbnail(url=ctx.author.display_avatar.url)
         await ctx.respond('_ _', embed=dice_embed)
     
-    def stat_embed_creator(self, charaname, characolor, charaimg, charastat, result, command_txt, calc_txt, comment_txt=None):
+    def stat_embed_creator(self, charaname, characolor, charaimg, charastat, result, command_txt, calc_txt, embed_link, comment_txt=None):
         title_txt = f'🎲\a {charaname} ROLLED \a**` {result} {charastat} `**'
         if comment_txt:
             title_txt += '\n' + f'💬\a **` {comment_txt} `**'
@@ -123,6 +127,7 @@ class Randomizer(commands.Cog):
             title = title_txt,
             description = f'🎰\a **FROM THE ROLL** \a{command_txt}' + '\n' + f'🧮\a **CALCULATED AS** \a{calc_txt}',
             color = characolor,
+            url = embed_link,
         )
         stat_embed.set_thumbnail(url=charaimg)
         return stat_embed
@@ -196,7 +201,8 @@ class Randomizer(commands.Cog):
             hex_int = int(hex_str, base=16)
             chara_img = selected_character[6]
             output_array = self.roll_stat_helper(stat, stat_modifier, amount, sides, apply, modifier)
-            stat_embed = self.stat_embed_creator(character.upper(), hex_int, chara_img, stat, output_array[0], output_array[1], output_array[2], comment)
+            embed_link = f'https://discord.com/channels/{ctx.guild.id}/{ctx.channel.id}'
+            stat_embed = self.stat_embed_creator(character.upper(), hex_int, chara_img, stat, output_array[0], output_array[1], output_array[2], embed_link, comment)
             await ctx.respond('_ _', embed=stat_embed)
 
 def setup(bot):

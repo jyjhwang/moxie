@@ -44,7 +44,7 @@ class Moderation(commands.Cog):
                     description = quoted_message.clean_content,
                     color = int('2B2D31', base=16),
                 )
-                quote_embed.add_field(name='\a', value=f'[` JUMP TO MESSAGE `]({quoted_message.jump_url})')
+                quote_embed.add_field(name='\a', value=f'🔗 [` JUMP TO MESSAGE `]({quoted_message.jump_url})')
                 quote_embed.set_author(name=message.author.display_name, icon_url=message.author.display_avatar.url)
                 if message.channel != quoted_message.channel:
                     quote_embed.set_footer(text=f'#{quoted_message.channel}')
