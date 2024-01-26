@@ -10,7 +10,7 @@ activity = discord.Activity(type=discord.ActivityType.watching, name='over you.'
 bot = discord.Bot(intents=intents, activity=activity, status=discord.Status.idle)
 
 cogs_list = [
-    'log',
+    'exporter',
     'moderation',
     'randomizer',
     'rolegroups',

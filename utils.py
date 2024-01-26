@@ -1,8 +1,9 @@
 import discord
 
-def basic_embed_creator(title_txt):
+def basic_embed_creator(title_txt, description_txt):
         basic_embed = discord.Embed(
             title = title_txt,
+            description = description_txt,
             color = int('2B2D31', base=16),
         )
         return basic_embed

@@ -72,11 +72,11 @@ class Moderation(commands.Cog):
             message_txt = 'MESSAGE'
         if not user:
             await ctx.channel.purge(limit=limit, check=lambda msg: not msg.pinned)
-            prune_embed = basic_embed_creator(f'❌\a ` PRUNED `  {amount} ' + message_txt)
+            prune_embed = basic_embed_creator(f'❌\a ` PRUNED `  {amount} ' + message_txt, None)
             await ctx.respond('_ _', embed=prune_embed, ephemeral=True)
         else:
             await ctx.channel.purge(limit=limit, check=lambda msg: msg.author == user and not msg.pinned)
-            prune_embed = basic_embed_creator(f'❌\a ` PRUNED ` \a{amount} ' + message_txt)
+            prune_embed = basic_embed_creator(f'❌\a ` PRUNED ` \a{amount} ' + message_txt, None)
             prune_embed.add_field(name='', value=f'🆔\a ` FROM ` \a{user.mention}')
             await ctx.respond('_ _', embed=prune_embed, ephemeral=True)
 
@@ -103,7 +103,7 @@ class Moderation(commands.Cog):
                 role = ctx.guild.get_role(int(role_id))
                 button_roles_view.add_item(RoleButton(role, button_styles[remainder]))
 
-            button_roles_embed = basic_embed_creator(f'⬇️\a Click these buttons to get your roles!')
+            button_roles_embed = basic_embed_creator(f'⬇️\a Click these buttons to get your roles!', None)
             await ctx.respond('_ _', ephemeral=True, delete_after=1)
             await ctx.send('_ _', embed=button_roles_embed, view=button_roles_view)
 

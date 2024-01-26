@@ -34,7 +34,7 @@ class RoleGroups(commands.Cog):
                 async with db.cursor() as cursor:
                     await cursor.execute('INSERT INTO rolegroups_table VALUES (?, ?, ?, ?)', (ctx.guild.id, ctx.guild.name, rolegroup_name.upper(), role_ids))
                 await db.commit()
-                rolegroup_embed = basic_embed_creator(f'✅\a ADDED ROLE GROUP \a` {rolegroup_name.upper()} `')
+                rolegroup_embed = basic_embed_creator(f'✅\a ADDED ROLE GROUP \a` {rolegroup_name.upper()} `', None)
                 await ctx.respond('_ _', embed=rolegroup_embed, ephemeral=True)
 
     @rolegroups.command(name='update', description='UPDATE ROLE GROUP.')
@@ -47,7 +47,7 @@ class RoleGroups(commands.Cog):
                 async with db.cursor() as cursor:
                     await cursor.execute('UPDATE rolegroups_table SET role_ids = ? WHERE guild_id = ? AND rolegroup_name = ?', (role_ids, ctx.guild.id, rolegroup_name.upper()))
                 await db.commit()
-                rolegroup_embed = basic_embed_creator(f'🔄\a UPDATED ROLE GROUP \a` {rolegroup_name.upper()} `')
+                rolegroup_embed = basic_embed_creator(f'🔄\a UPDATED ROLE GROUP \a` {rolegroup_name.upper()} `', None)
                 await ctx.respond('_ _', embed=rolegroup_embed, ephemeral=True)
 
     @rolegroups.command(name='remove', description='REMOVE ROLE GROUPS.')
@@ -56,7 +56,7 @@ class RoleGroups(commands.Cog):
             async with db.cursor() as cursor:
                 await cursor.execute('DELETE FROM rolegroups_table WHERE guild_id = ? AND rolegroup_name = ?', (ctx.guild.id, rolegroup_name.upper()))
             await db.commit()
-            rolegroup_embed = basic_embed_creator(f'❌\a REMOVED ROLE GROUP \a` {rolegroup_name.upper()} `')
+            rolegroup_embed = basic_embed_creator(f'❌\a REMOVED ROLE GROUP \a` {rolegroup_name.upper()} `', None)
             await ctx.respond('_ _', embed=rolegroup_embed, ephemeral=True)
 
 def setup(bot):

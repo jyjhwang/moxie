@@ -40,7 +40,7 @@ class Roster(commands.Cog):
             async with db.cursor() as cursor:
                 await cursor.execute('INSERT INTO roster_table VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (owner.id, owner.name, ctx.guild.id, ctx.guild.name, charaname.upper(), characolor, charaimg, constitution, strength, dexterity, wisdom, intelligence, charisma))
             await db.commit()
-            roster_embed = basic_embed_creator(f'✅\a ` ADDED CHARACTER ` \a{charaname.upper()}')
+            roster_embed = basic_embed_creator(f'✅\a ` ADDED CHARACTER ` \a{charaname.upper()}', None)
             roster_embed.add_field(name='', value=f'🆔\a ` OWNED BY ` \a{owner.mention}')
             await ctx.respond('_ _', embed=roster_embed, ephemeral=True)
     
@@ -50,7 +50,7 @@ class Roster(commands.Cog):
             async with db.cursor() as cursor:
                 await cursor.execute('UPDATE roster_table SET character_con = ?, character_str = ?, character_dex = ?, character_wis = ?, character_int = ?, character_cha = ? WHERE user_name = ? AND guild_id = ? AND character_name = ?', (constitution, strength, dexterity, wisdom, intelligence, charisma, owner.name, ctx.guild.id, charaname.upper()))
             await db.commit()
-            roster_embed = basic_embed_creator(f'🔄\a ` UPDATED CHARACTER STATS FOR ` \a{charaname.upper()}')
+            roster_embed = basic_embed_creator(f'🔄\a ` UPDATED CHARACTER STATS FOR ` \a{charaname.upper()}', None)
             roster_embed.add_field(name='', value=f'🆔\a ` OWNED BY ` \a{owner.mention}')
             await ctx.respond('_ _', embed=roster_embed, ephemeral=True)
 
@@ -60,7 +60,7 @@ class Roster(commands.Cog):
             async with db.cursor() as cursor:
                 await cursor.execute('UPDATE roster_table SET character_color = ?, character_img = ? WHERE user_name = ? AND guild_id = ? AND character_name = ?', (characolor, charaimg, owner.name, ctx.guild.id, charaname.upper()))
             await db.commit()
-            roster_embed = basic_embed_creator(f'🔄\a ` UPDATED CHARACTER VISUALS FOR ` \a{charaname.upper()}')
+            roster_embed = basic_embed_creator(f'🔄\a ` UPDATED CHARACTER VISUALS FOR ` \a{charaname.upper()}', None)
             roster_embed.add_field(name='', value=f'🆔\a ` OWNED BY ` \a{owner.mention}')
             await ctx.respond('_ _', embed=roster_embed, ephemeral=True)
 
@@ -70,7 +70,7 @@ class Roster(commands.Cog):
             async with db.cursor() as cursor:
                 await cursor.execute('DELETE FROM roster_table WHERE user_name = ? AND guild_id = ? AND character_name = ?', (owner.name, ctx.guild.id, charaname.upper()))
             await db.commit()
-            roster_embed = basic_embed_creator(f'❌\a ` REMOVED CHARACTER ` \a{charaname.upper()}')
+            roster_embed = basic_embed_creator(f'❌\a ` REMOVED CHARACTER ` \a{charaname.upper()}', None)
             roster_embed.add_field(name='', value=f'🆔\a ` OWNED BY ` \a{owner.mention}')
             await ctx.respond('_ _', embed=roster_embed, ephemeral=True)
 
