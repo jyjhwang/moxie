@@ -49,7 +49,7 @@ class Randomizer(commands.Cog):
         else:
             return f'{value}'
     
-    def dice_embed_creator(self, result, command_txt, embed_link, comment_txt=None, calc_txt=None):
+    def dice_embed_creator(self, result, command_txt, role_color, embed_link, comment_txt=None, calc_txt=None):
         title_txt = f'🎲\a YOU ROLLED \a**` {result} `**'
         if comment_txt:
             title_txt += '\n' + f'💬\a **` {comment_txt} `**'
@@ -59,7 +59,7 @@ class Randomizer(commands.Cog):
         dice_embed = discord.Embed(
             title = title_txt,
             description = description_txt,
-            color = int('2B2D31', base=16),
+            color = role_color,
             url = embed_link,
         )
         return dice_embed
@@ -113,9 +113,9 @@ class Randomizer(commands.Cog):
         output_array = self.roll_dice_helper(amount, sides, apply, modifier)
         embed_link = f'https://discord.com/channels/{ctx.guild.id}/{ctx.channel.id}'
         if amount == 1 and not modifier:
-            dice_embed = self.dice_embed_creator(output_array[0], output_array[1], embed_link, comment)
+            dice_embed = self.dice_embed_creator(output_array[0], output_array[1], ctx.author.color, embed_link, comment)
         else:
-            dice_embed = self.dice_embed_creator(output_array[0], output_array[1], embed_link, comment, output_array[3])
+            dice_embed = self.dice_embed_creator(output_array[0], output_array[1], ctx.author.color, embed_link, comment, output_array[3])
         dice_embed.set_thumbnail(url=ctx.author.display_avatar.url)
         await ctx.respond('_ _', embed=dice_embed)
     
@@ -129,7 +129,8 @@ class Randomizer(commands.Cog):
             color = characolor,
             url = embed_link,
         )
-        stat_embed.set_thumbnail(url=charaimg)
+        if not charaimg.upper() == 'NONE':
+            stat_embed.set_thumbnail(url=charaimg)
         return stat_embed
     
     async def select_character(self, userid, guildid, charaname):
