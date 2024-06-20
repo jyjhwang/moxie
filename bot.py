@@ -13,7 +13,6 @@ cogs_list = [
     'exporter',
     'moderation',
     'randomizer',
-    'rolegroups',
     'roster',
 ]
 
