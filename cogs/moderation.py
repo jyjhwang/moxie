@@ -161,6 +161,9 @@ class Moderation(commands.Cog):
                     await db.commit()
                 update_embed = basic_embed_creator(f'⭐\a **THE STARBOARD CHANNEL HAS BEEN SET TO** \a{channel.mention}', None)
                 await ctx.respond('_ _', embed=update_embed, ephemeral=True)
+            else:
+                notify_embed = basic_embed_creator(f'⭐\a **THE STARBOARD CHANNEL IS ALREADY SET TO** \a{channel.mention}', None)
+                await ctx.respond('_ _', embed=notify_embed, ephemeral=True)
         else:
             async with aiosqlite.connect('starboard_setup.db') as db:
                 async with db.cursor() as cursor:

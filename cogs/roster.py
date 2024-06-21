@@ -55,6 +55,7 @@ class Roster(commands.Cog):
                 title = '🗃️\a ROSTER FOR \a' + f'**` {ctx.guild.name} `**',
                 color = int('2B2D31', base=16),
             )
+            list_embed.add_field(name='', value='', inline=False)
             owned_by_list = '\n'.join(f'<@{id}>' for id in user_id_list)
             character_list = '\n'.join(str(name) for name in character_name_list)
             list_embed.add_field(name='Character', value=character_list, inline=True)
@@ -96,7 +97,7 @@ class Roster(commands.Cog):
                     await cursor.execute('INSERT INTO roster_table VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (owner.id, owner.name, ctx.guild.id, ctx.guild.name, chara_name.upper(), chara_color.upper(), chara_img, constitution, strength, dexterity, wisdom, intelligence, charisma))
                 await db.commit()
                 roster_embed = basic_embed_creator(f'✅\a ADDED CHARACTER \a**` {chara_name.upper()} `**', None)
-                roster_embed.add_field(name='', value=f'👑\a **OWNED BY** \a{owner.mention}')
+                roster_embed.add_field(name='', value=f'👑\a **OWNER** \a{owner.mention}')
                 await ctx.respond('_ _', embed=roster_embed, ephemeral=True)
     
     @roster.command(name='remove', description='Remove a character from the roster.')
@@ -111,7 +112,7 @@ class Roster(commands.Cog):
                     await cursor.execute('DELETE FROM roster_table WHERE user_name = ? AND guild_id = ? AND character_name = ?', (owner.name, ctx.guild.id, chara_name.upper()))
                 await db.commit()
                 roster_embed = basic_embed_creator(f'❌\a REMOVED CHARACTER \a**` {chara_name.upper()} `**', None)
-                roster_embed.add_field(name='', value=f'👑\a **OWNED BY** \a{owner.mention}')
+                roster_embed.add_field(name='', value=f'👑\a **OWNER** \a{owner.mention}')
                 await ctx.respond('_ _', embed=roster_embed, ephemeral=True)
     
     @update_roster.command(name='stats', description='Update a character\'s stats.')
@@ -126,7 +127,7 @@ class Roster(commands.Cog):
                     await cursor.execute('UPDATE roster_table SET character_con = ?, character_str = ?, character_dex = ?, character_wis = ?, character_int = ?, character_cha = ? WHERE user_name = ? AND guild_id = ? AND character_name = ?', (constitution, strength, dexterity, wisdom, intelligence, charisma, owner.name, ctx.guild.id, chara_name.upper()))
                 await db.commit()
                 roster_embed = basic_embed_creator(f'🔄\a UPDATED STATS FOR \a**` {chara_name.upper()} `**', None)
-                roster_embed.add_field(name='', value=f'👑\a **OWNED BY** \a{owner.mention}')
+                roster_embed.add_field(name='', value=f'👑\a **OWNER** \a{owner.mention}')
                 await ctx.respond('_ _', embed=roster_embed, ephemeral=True)
 
     @update_roster.command(name='visuals', description='Update a character\'s visuals.')
@@ -141,7 +142,7 @@ class Roster(commands.Cog):
                     await cursor.execute('UPDATE roster_table SET character_color = ?, character_img = ? WHERE user_name = ? AND guild_id = ? AND character_name = ?', (chara_color.upper(), chara_img, owner.name, ctx.guild.id, chara_name.upper()))
                 await db.commit()
                 roster_embed = basic_embed_creator(f'🔄\a UPDATED VISUALS FOR \a**` {chara_name.upper()} `**', None)
-                roster_embed.add_field(name='', value=f'👑\a **OWNED BY** \a{owner.mention}')
+                roster_embed.add_field(name='', value=f'👑\a **OWNER** \a{owner.mention}')
                 await ctx.respond('_ _', embed=roster_embed, ephemeral=True)
 
 def setup(bot):
